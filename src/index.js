@@ -1,22 +1,48 @@
 const fs = require("fs");
 
-function extractUsernames(filePath) {
+console.log("starting the followers check...");
+
+function readJsonFile(filePath) {
   try {
+    //check if the file exists
+    if (!fs.existsSync(filePath)) {
+      console.log(`file not found: ${filePath}`);
+      return null;
+    }
     const fileContent = fs.readFileSync(filePath, "utf8");
-    const data = JSON.parse(fileContent);
-    return data;
+    return JSON.parse(fileContent);
   } catch (error) {
     console.log("error parsing file", error);
     return null;
   }
 }
 
-const followersData = extractUsernames("./followers_1.json");
-const followingData = extractUsernames(".following.json");
+const followersData = readJsonFile("./followers_1.json");
+const followingData = readJsonFile(".following.json");
 
 if (!followersData || !followingData) {
-  console.log("Could not load data. Make sure both files are at the right folder!");
+  console.log("Could not load data. Make sure both files are at the right folder and try again!");
+  process.exit(1);
+}
+
+const followersList = followersData.map((follower) => follower.string_list_data?.[0]?.value);
+
+const followingList = followingData.relationships_following.map(
+  (following) => followingData.string_list_data?.[0]?.value
+);
+
+console.log("followers count:", followersList.length);
+console.log("following count:", followingList.length);
+
+const followersSet = new Set(followersList);
+
+const notFollowingBack = followingList.filter((username) => !followersSet.has(username));
+
+if (nonFollowers.length === 0) {
+  console.log("🎉 Great news! Everyone you follow also follows you back.");
 } else {
-  console.log("\nFollower entry:", followersData[0]);
-  console.log("\nFollowing entry:", followersData[0]);
+  console.log("You have", nonFollowers.length, "people who don't follow you back.");
+  nonFollowers.forEach((username) => {
+    console.log("- ${username}");
+  });
 }
