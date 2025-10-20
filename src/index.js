@@ -17,8 +17,8 @@ function readJsonFile(filePath) {
   }
 }
 
-const followersData = readJsonFile("./followers_1.json");
-const followingData = readJsonFile(".following.json");
+const followersData = readJsonFile("../files/followers_1.json");
+const followingData = readJsonFile("../files/following.json");
 
 if (!followersData || !followingData) {
   console.log("Could not load data. Make sure both files are at the right folder and try again!");
@@ -27,9 +27,7 @@ if (!followersData || !followingData) {
 
 const followersList = followersData.map((follower) => follower.string_list_data?.[0]?.value);
 
-const followingList = followingData.relationships_following.map(
-  (following) => followingData.string_list_data?.[0]?.value
-);
+const followingList = followingData.relationships_following.map((following) => following.string_list_data?.[0]?.value);
 
 console.log("followers count:", followersList.length);
 console.log("following count:", followingList.length);
@@ -38,11 +36,11 @@ const followersSet = new Set(followersList);
 
 const notFollowingBack = followingList.filter((username) => !followersSet.has(username));
 
-if (nonFollowers.length === 0) {
+if (notFollowingBack.length === 0) {
   console.log("🎉 Great news! Everyone you follow also follows you back.");
 } else {
-  console.log("You have", nonFollowers.length, "people who don't follow you back.");
-  nonFollowers.forEach((username) => {
-    console.log("- ${username}");
+  console.log("You have", notFollowingBack.length, "people who don't follow you back.");
+  notFollowingBack.forEach((username) => {
+    console.log({ username });
   });
 }
